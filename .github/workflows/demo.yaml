@@ -1,0 +1,22 @@
+name: Base CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Standard checkout - always good to have
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # A completely safe step
+      - name: Run Dummy Script
+        run: |
+          echo "System is operational."
+          echo "This workflow is safe and valid."
